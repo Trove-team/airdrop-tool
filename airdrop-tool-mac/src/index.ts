@@ -77,6 +77,10 @@ const connectionConfig = {
 	]);
 	runMain();
 
+	const nekoAmountBig = BigInt(nekoAmount);
+
+	console.log("NEKO AMOUNT:", nekoAmountBig);
+
 	async function runMain() {
 		if (!confirmFile.confirm) {
 			console.log("Okay Bye");
@@ -100,8 +104,9 @@ const connectionConfig = {
 			const promiseNonce = nonce + index;
 			const promise = new Promise<void>(async (resolve) => {
 				const id = data[0];
-				const holdAmount = data[1];
-				const transferAmount = holdAmount * nekoAmount;
+				const holdAmount = BigInt(data[1]);
+				const transferAmount = holdAmount * nekoAmountBig;
+				console.log("Transfer Amount:", transferAmount.toString());
 				try {
 					let isAccountValid = false;
 					//validate account Id first
