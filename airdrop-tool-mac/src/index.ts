@@ -7,6 +7,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+import BN from "bn.js";
 const homedir = os.homedir();
 const CREDENTIALS_DIR = ".near-credentials";
 const credentialsPath = join(homedir, CREDENTIALS_DIR);
@@ -77,9 +78,9 @@ const connectionConfig = {
 	]);
 	runMain();
 
-	const nekoAmountBig = BigInt(nekoAmount);
+	const nekoAmountBig = new BN(nekoAmount);
 
-	console.log("NEKO AMOUNT:", nekoAmountBig);
+	console.log("NEKO AMOUNT:", nekoAmountBig.toString());
 
 	async function runMain() {
 		if (!confirmFile.confirm) {
@@ -104,8 +105,8 @@ const connectionConfig = {
 			const promiseNonce = nonce + index;
 			const promise = new Promise<void>(async (resolve) => {
 				const id = data[0];
-				const holdAmount = BigInt(data[1]);
-				const transferAmount = holdAmount * nekoAmountBig;
+				const holdAmount = new BN(data[1]);
+				const transferAmount = holdAmount.mul(nekoAmountBig);
 				console.log("Transfer Amount:", transferAmount.toString());
 				try {
 					let isAccountValid = false;
@@ -116,7 +117,7 @@ const connectionConfig = {
 							console.log("Invalid account Id:", id);
 							await fs.appendFile(
 								join(__dirname, "..", "error", listName + ".txt"),
-								`${id}:${transferAmount}\r\n`
+								`${id}:${transferAmount.toString()}\r\n`
 							);
 							delete list[id];
 							await fs.writeFile(
@@ -144,8 +145,8 @@ const connectionConfig = {
 									account_id: id,
 									registration_only: true,
 								},
-								"30000000000000",
-								utils.format.parseNearAmount("0.00125")!.toString()
+								new BN("30000000000000"),
+								new BN(utils.format.parseNearAmount("0.00125")!)
 							)
 						);
 					}
@@ -157,8 +158,8 @@ const connectionConfig = {
 								receiver_id: id,
 								amount: transferAmount.toString(),
 							},
-							"30000000000000",
-							"1"
+							new BN("30000000000000"),
+							new BN("1")
 						)
 					);
 
